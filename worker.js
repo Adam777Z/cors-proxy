@@ -1,18 +1,19 @@
-// Source: https://rednafi.com/javascript/cors_proxy_with_cloudflare_workers/
+// Source: https://rednafi.com/javascript/cors_proxy_with_cloudflare_workers/ & https://github.com/rednafi/cors-proxy
+// With modifications
 export default {
 	async fetch(request, env, ctx) {
-		// Extract method, url and headers from the incoming request object.
-		const { method, url, headers } = request;
+		// Extract data from the incoming request object
+		const { method, url, headers, body } = request;
 
-		// Extract destination url from the query string.
+		// Extract destination url from the query string
 		const destUrl = new URL(url).searchParams.get("url");
 
-		// If the destination url is not present, return 400.
+		// If the destination url is not present, return 400
 		if (!destUrl) {
 			return new Response("Missing destination URL.", { status: 400 });
 		}
 
-		// If the request method is OPTIONS, return CORS headers.
+		// If the request method is OPTIONS, return CORS headers
 		if (
 			method === "OPTIONS" &&
 			headers.has("Origin") &&
@@ -21,9 +22,7 @@ export default {
 			const responseHeaders = {
 				"Access-Control-Allow-Origin": headers.get("Origin"),
 				"Access-Control-Allow-Methods": "*", // Allow all methods
-				"Access-Control-Allow-Headers": headers.get(
-					"Access-Control-Request-Headers"
-				),
+				"Access-Control-Allow-Headers": headers.get("Access-Control-Request-Headers"),
 				"Access-Control-Max-Age": "86400",
 			};
 			return new Response(null, { headers: responseHeaders });
@@ -35,6 +34,7 @@ export default {
 				...headers,
 				Origin: "",
 			},
+			body: body
 		});
 
 		try {
