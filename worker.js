@@ -16,24 +16,23 @@ export default {
 		// If the request method is OPTIONS, return CORS headers
 		if (
 			method === "OPTIONS" &&
-			headers.has("Origin") &&
 			headers.has("Access-Control-Request-Method")
 		) {
 			const responseHeaders = {
-				"Access-Control-Allow-Origin": headers.get("Origin"),
-				"Access-Control-Allow-Methods": "*", // Allow all methods
-				"Access-Control-Allow-Headers": headers.get("Access-Control-Request-Headers"),
+				"Access-Control-Allow-Origin": "*", // Allow all
+				"Access-Control-Allow-Methods": "*", // Allow all
+				"Access-Control-Allow-Headers": "*", // Allow all
 				"Access-Control-Max-Age": "86400",
 			};
 			return new Response(null, { headers: responseHeaders });
 		}
 
+		const proxyHeaders = new Headers(headers);
+		proxyHeaders.delete("Origin");
+
 		const proxyRequest = new Request(destUrl, {
 			method,
-			headers: {
-				...headers,
-				Origin: "",
-			},
+			headers: proxyHeaders,
 			body: body
 		});
 
